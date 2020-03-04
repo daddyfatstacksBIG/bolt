@@ -1,14 +1,14 @@
 // @flow
 import chalk from 'chalk';
 import type Package from '../Package';
-import { toString, type Message } from './messages';
+import {toString, type Message} from './messages';
 
 type LoggerOpts = {
-  prefix?: string | false,
+  prefix?: string|false,
   emoji?: string
 };
 
-function fmt(str: Message | Buffer | string, opts: LoggerOpts = {}) {
+function fmt(str: Message|Buffer|string, opts: LoggerOpts = {}) {
   let result = toString(str);
 
   let prefix = opts.prefix || '';
@@ -18,11 +18,10 @@ function fmt(str: Message | Buffer | string, opts: LoggerOpts = {}) {
   }
 
   if (prefix) {
-    result = result
-      .trimRight()
-      .split('\n')
-      .map(line => `${prefix} ${line}`)
-      .join('\n');
+    result = result.trimRight()
+                 .split('\n')
+                 .map(line => `${prefix} ${line}`)
+                 .join('\n');
   }
 
   return result;
@@ -36,11 +35,8 @@ function prompt(pkg, cmd) {
   return prompt + ' $ ' + cmd;
 }
 
-function write(
-  message: Message | Buffer | string,
-  opts: LoggerOpts = {},
-  err: boolean = false
-) {
+function write(message: Message|Buffer|string, opts: LoggerOpts = {},
+               err: boolean = false) {
   if (err) {
     console.error(fmt(message, opts));
   } else {
@@ -48,13 +44,11 @@ function write(
   }
 }
 
-export function title(
-  title: Message,
-  subtitle: Message,
-  opts: LoggerOpts = {}
-) {
+export function title(title: Message, subtitle: Message,
+                      opts: LoggerOpts = {}) {
   let str = chalk.bold(title);
-  if (subtitle) str += ' ' + chalk.dim(subtitle);
+  if (subtitle)
+    str += ' ' + chalk.dim(subtitle);
   write(str, opts);
 }
 
@@ -64,39 +58,31 @@ const ERROR_PREFIX = chalk.red('error');
 const SUCCESS_PREFIX = chalk.green('success');
 
 export function info(message: Message, opts: LoggerOpts = {}) {
-  write(message, { prefix: INFO_PREFIX, ...opts }, true);
+  write(message, {prefix : INFO_PREFIX, ...opts}, true);
 }
 
 export function warn(message: Message, opts: LoggerOpts = {}) {
-  write(message, { prefix: WARN_PREFIX, ...opts }, true);
+  write(message, {prefix : WARN_PREFIX, ...opts}, true);
 }
 
 export function error(message: Message, opts: LoggerOpts = {}) {
-  write(message, { prefix: ERROR_PREFIX, ...opts }, true);
+  write(message, {prefix : ERROR_PREFIX, ...opts}, true);
 }
 
 export function success(message: Message, opts: LoggerOpts = {}) {
-  write(message, { prefix: SUCCESS_PREFIX, ...opts }, true);
+  write(message, {prefix : SUCCESS_PREFIX, ...opts}, true);
 }
 
-export function stdout(
-  cmd: string,
-  data: Buffer,
-  pkg?: Package,
-  opts: LoggerOpts = {}
-) {
+export function stdout(cmd: string, data: Buffer, pkg?: Package,
+                       opts: LoggerOpts = {}) {
   let prefix = chalk.cyan(prompt(pkg, cmd));
-  write(data, { prefix, ...opts }, false);
+  write(data, {prefix, ...opts}, false);
 }
 
-export function stderr(
-  cmd: string,
-  data: Buffer,
-  pkg?: Package,
-  opts: LoggerOpts = {}
-) {
+export function stderr(cmd: string, data: Buffer, pkg?: Package,
+                       opts: LoggerOpts = {}) {
   let prefix = chalk.red(prompt(pkg, cmd));
-  write(data, { prefix, ...opts }, true);
+  write(data, {prefix, ...opts}, true);
 }
 
 export function cmd(cmd: string, args: Array<string>, opts: LoggerOpts = {}) {
