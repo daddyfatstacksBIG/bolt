@@ -1,7 +1,8 @@
 // @flow
 import includes from 'array-includes';
-import projectBinPath from 'project-bin-path';
 import * as path from 'path';
+import projectBinPath from 'project-bin-path';
+
 import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
 import Project from '../Project';
@@ -33,7 +34,8 @@ async function getEnvWithUserAgents() {
   };
 }
 
-/* Add the relevant *_config_user_agent env vars to all spawned yarn processes */
+/* Add the relevant *_config_user_agent env vars to all spawned yarn processes
+ */
 async function spawnWithUserAgent(
   cmd: string,
   args: string[],
@@ -41,10 +43,7 @@ async function spawnWithUserAgent(
 ) {
   return processes.spawn(cmd, args, {
     ...opts,
-    env: {
-      ...(await getEnvWithUserAgents()),
-      ...(opts && opts.env)
-    }
+    env: { ...(await getEnvWithUserAgents()), ...(opts && opts.env) }
   });
 }
 
@@ -100,7 +99,8 @@ export async function add(
   await spawnWithUserAgent(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -125,7 +125,8 @@ export async function upgrade(
   await spawnWithUserAgent(localYarn, [...spawnArgs, ...flags], {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -136,7 +137,8 @@ export async function run(
 ) {
   let project = await Project.init(pkg.dir);
   let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  // We use a relative path because the absolute paths are very long and noisy in logs
+  // We use a relative path because the absolute paths are very long and noisy
+  // in logs
   let localYarnRelative = path.relative(pkg.dir, localYarn);
   let spawnArgs = ['run', '-s', script];
 
@@ -217,9 +219,7 @@ export async function userAgent() {
   let { stdout: yarnUserAgent } = await processes.spawn(
     localYarn,
     ['config', 'get', 'user-agent'],
-    {
-      tty: false
-    }
+    { tty: false, silent: true }
   );
 
   return yarnUserAgent.replace(/\n/g, '');
@@ -240,7 +240,5 @@ export async function globalCli(
     }
   });
 
-  await spawnWithUserAgent('yarn', spawnArgs, {
-    tty: true
-  });
+  await spawnWithUserAgent('yarn', spawnArgs, { tty: true });
 }

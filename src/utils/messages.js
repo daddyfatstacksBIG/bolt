@@ -190,6 +190,9 @@ export function helpContent(): string {
     usage
       $ bolt [command] <...args> <...opts>
 
+    options:
+      --no-prefix Do not prefix spawned process output with the command string
+
     commands
       init         init a bolt project
       install      install a bolt project
@@ -336,8 +339,8 @@ export function errorParsingJSON(filePath: string): Message {
   return `Error parsing JSON in file:\n${filePath}`;
 }
 
-// TODO: This message actually only makes sense when using changeset commands, so should probably
-// be rethought out once `bolt version`, etc is ready
+// TODO: This message actually only makes sense when using changeset commands,
+// so should probably be rethought out once `bolt version`, etc is ready
 export function invalidBoltWorkspacesFromUpdate(
   name: string,
   depName: string,
