@@ -47,7 +47,7 @@ export default async function addDependenciesToPackage(
 
     // Update all workspace versions
     const depsToUpgrade = externalDeps.reduce((prev, dep) => {
-      prev[dep.name] = dep.version;
+      prev[dep.name] = project.pkg.getDependencyVersionRange(dep.name);
       return prev;
     }, {});
     await updateWorkspaceDependencies(depsToUpgrade, {
@@ -97,5 +97,9 @@ export default async function addDependenciesToPackage(
     await pkg.setDependencyVersionRange(depName, type, String(depVersion));
   }
 
-  await symlinkPackageDependencies(project, pkg, dependencyNames);
+  // Now that all the new stuff is there, do this one more time to get the updates
+  let packagesFinal = await project.getPackages();
+  let { graph: depGraphFinal } = await project.getDependencyGraph(packagesFinal);
+
+  await symlinkPackageDependencies(project, pkg, dependencyNames, depGraphFinal);
 }

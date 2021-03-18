@@ -1,9 +1,30 @@
 # Bolt Changelog
 
-# 0.24.3
+# 0.24.9
+
+* Include package names in error output on no bail task failures (#291 thanks @Blasz)
+# 0.24.8
+
+* updates for faster symlinking (#286 thanks @jonathancreamer-eb)
+# 0.24.7
+
+* Fix workspace versions not resolving when installed via dist tag (#283 thanks @Blasz)
+
+# 0.24.6
+
+* Bumps dependencies on `meow` and `inquirer` (#278 thanks @patrickcylai)
+* Fix issue where `bolt` twice would break during bin symlink step (#273 thanks @jcreamer898)
+
+# 0.24.5
+
+* Add --no-prefix flag to disable prefixing subcommand output with the command string
+
+# 0.24.4
+
 * Fix --no-bail not throwing when running in default orderMode (#256)
 
 # 0.24.3
+
 * Fixes `--help` so that is is correctly passed down to other commands (#252)
 * `bolt add` on an existing dependency now correctly updates all workspaces versions if required (#251)
 * Allow exclusion of certain dependency types from dependency graph (#244)

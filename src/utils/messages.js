@@ -190,6 +190,9 @@ export function helpContent(): string {
     usage
       $ bolt [command] <...args> <...opts>
 
+    options:
+      --no-prefix Do not prefix spawned process output with the command string
+
     commands
       init         init a bolt project
       install      install a bolt project
@@ -411,7 +414,10 @@ export function taskRunningAcrossCINodes(
 
 export function taskFailed(
   numFailures: number,
-  failuresWithMsg: string[]
+  failuresWithMsg: string[],
+  packageNames: string[]
 ): Message {
-  return `${numFailures} tasks failed.\n${failuresWithMsg.join('\n')}`;
+  return `${numFailures} tasks failed for ${String(
+    packageNames
+  )}.\n${failuresWithMsg.join('\n')}`;
 }

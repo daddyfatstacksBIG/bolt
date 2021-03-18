@@ -14,15 +14,9 @@ import * as yarn from './yarn';
 export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
-  dependencies: Array<string>
+  dependencies: Array<string>,
+  dependencyGraph: Map<string, { pkg: Package, dependencies: Array<string> }>
 ) {
-  let projectDeps = project.pkg.getAllDependencies();
-  let pkgDependencies = project.pkg.getAllDependencies();
-  let packages = await project.getPackages();
-  let {
-    graph: dependencyGraph,
-    valid: dependencyGraphValid
-  } = await project.getDependencyGraph(packages);
   let pkgName = pkg.config.getName();
   // get all the dependencies that are internal workspaces in this project
   let internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];
@@ -97,7 +91,7 @@ export default async function symlinkPackageDependencies(
     symlinksToCreate.push({ src, dest, type: 'junction' });
   }
 
-  if (!dependencyGraphValid || !valid) {
+  if (!valid) {
     throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
 
@@ -173,8 +167,8 @@ export default async function symlinkPackageDependencies(
       let binName = dependency.split('/').pop();
       let src = path.join(depWorkspace.pkg.dir, depBinFiles);
       let dest = path.join(pkg.nodeModulesBin, binName);
-
-      symlinksToCreate.push({ src, dest, type: 'exec' });
+      let exists = await fs.symlinkExists(dest);
+      !exists && symlinksToCreate.push({ src, dest, type: 'exec' });
       continue;
     }
 
@@ -184,7 +178,8 @@ export default async function symlinkPackageDependencies(
 
       // Just in case the symlink is already added (it might have already existed in the projects bin/)
       if (!symlinksToCreate.find(symlink => symlink.dest === dest)) {
-        symlinksToCreate.push({ src, dest, type: 'exec' });
+        let exists = await fs.symlinkExists(dest);
+        !exists && symlinksToCreate.push({ src, dest, type: 'exec' });
       }
     }
   }
@@ -203,7 +198,11 @@ export default async function symlinkPackageDependencies(
 
   await Promise.all(
     symlinksToCreate.map(async ({ src, dest, type }) => {
-      await fs.symlink(src, dest, type);
+      const symlinkExists = await fs.symlinkExists(dest);
+
+      if (!symlinkExists) {
+        await fs.symlink(src, dest, type);
+      }
     })
   );
 
